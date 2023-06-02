@@ -74,7 +74,7 @@ const CustomizedTableRow: FC<TableRowProps>  = ({children, ...props}) => {
 }
 
 export default function ContestTable(props: {rule: MahjongType}) {
-    const {loading, data, error, fetchMore} = useQuery(QUERY_CONTEST_LIST, {
+    const {loading, data} = useQuery(QUERY_CONTEST_LIST, {
         variables: {
             pageNum: 0,
             rule: props.rule

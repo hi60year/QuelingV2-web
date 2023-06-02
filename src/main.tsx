@@ -45,7 +45,7 @@ const cache = new InMemoryCache({
 })
 
 const client = new ApolloClient({
-    uri: 'http://localhost:8080/query',
+    uri: 'http://111.231.33.190/api/query',
     cache
 });
 

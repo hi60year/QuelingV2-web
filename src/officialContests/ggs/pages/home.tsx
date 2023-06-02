@@ -89,7 +89,7 @@ function Register() {
 
     const [inviteCodeTextField, setInviteCodeTextField] = useState("")
 
-    const [getInviteCode, {data: inviteCodeData, loading: inviteCodeLoading, error: inviteCodeError}] = useLazyQuery(QUERY_INVITE_CODE, {
+    const [getInviteCode, {data: inviteCodeData, loading: inviteCodeLoading}] = useLazyQuery(QUERY_INVITE_CODE, {
         variables: {
             contestId: ggsQuelingId,
             inviteCode
@@ -223,7 +223,7 @@ function RegistrationPage(props: {inviteCode: string}) {
     const [submitDialogOpened, setSubmitDialogOpened] = useState(false)
     const nav = useNavigate()
 
-    const [getTeamNameExist, {data: teamNameExistData, loading: teamNameExistLoading, error: teamNameExistError}] = useLazyQuery(QUERY_TEAM_NAME_EXIST, {
+    const [getTeamNameExist, {data: teamNameExistData, loading: teamNameExistLoading}] = useLazyQuery(QUERY_TEAM_NAME_EXIST, {
         variables: {
             contestId: ggsQuelingId,
             name: debouncedTeamName
@@ -231,7 +231,7 @@ function RegistrationPage(props: {inviteCode: string}) {
         fetchPolicy: "network-only"
     })
 
-    const [saveTeam, {error: saveTeamError, data}] = useMutation(MUTATION_SAVE_TEAM, {
+    const [saveTeam, {data}] = useMutation(MUTATION_SAVE_TEAM, {
         variables: {
             payload: {
                 contestId: ggsQuelingId,
