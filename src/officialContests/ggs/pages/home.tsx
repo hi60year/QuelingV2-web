@@ -23,9 +23,7 @@ import {useDebounce, useMeasure} from "react-use";
 import './home.css'
 import {Check, Close, Delete} from "@mui/icons-material";
 import {TransitionGroup} from "react-transition-group";
-
-
-const ggsQuelingId = "64763ca531d1b9a31d40f7e3"
+import ggsQuelingId from "../utils/ggsQuelingId.ts";
 
 export default function GgsHome() {
     return (
