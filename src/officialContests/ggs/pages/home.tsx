@@ -219,6 +219,7 @@ function RegistrationPage(props: {inviteCode: string}) {
     const [players, setPlayers] = useState<PlayerPayload[]>([newPlayer()])
     const [leaderIndex, setLeaderIndex] = useState(0)
     const [validationError, setValidationError] = useState("")
+    const [submitDisabled, setSubmitDisabled] = useState(false)
     const [submitDialogOpened, setSubmitDialogOpened] = useState(false)
     const nav = useNavigate()
 
@@ -355,13 +356,16 @@ function RegistrationPage(props: {inviteCode: string}) {
     }
 
     const handleSubmit = async () => {
+        setSubmitDisabled(true)
         for (let i = 0; i < players.length; i++) {
             const it = players[i]
             if (!(it.name && it.tziakchaName && it.qqNum)) {
                 setValidationError(`选手${i + 1}的信息未填写完整!`)
+                setSubmitDisabled(false)
                 return
             } else if (!it.qqNum.match(/^[0-9]*$/)) {
                 setValidationError(`选手${i + 1}的QQ号码不合法!`)
+                setSubmitDisabled(false)
                 return
             }
         }
@@ -372,6 +376,7 @@ function RegistrationPage(props: {inviteCode: string}) {
             setSubmitDialogOpened(true)
         } else {
             setValidationError( (JSON.stringify(result.errors) ?? "") || (result?.data?.registerNewTeam?.error?.msg??""))
+            setSubmitDisabled(false)
         }
     }
 
@@ -481,7 +486,7 @@ function RegistrationPage(props: {inviteCode: string}) {
                         <Button variant={"contained"} sx={{backgroundColor: "grey", width: "130px"}} onClick={() => nav(0)}>
                             取消
                         </Button>
-                        <Button variant={"contained"} tabIndex={-1} sx={{backgroundColor: "green", width: "130px", ml:2}} onClick={handleSubmit}>
+                        <Button variant={"contained"} disabled={submitDisabled} tabIndex={-1} sx={{backgroundColor: "green", width: "130px", ml:2}} onClick={handleSubmit}>
                             提交
                         </Button>
                     </Box>
