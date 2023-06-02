@@ -5,6 +5,7 @@ import {Box, styled, Tab, TabProps, Tabs, TabsProps} from "@mui/material";
 import {Link, matchPath, useLocation} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Button from "@mui/material/Button";
+import findLastIndex from "../../../utils/findLastIndex.ts";
 
 
 const StyledTabs = styled((props: TabsProps) => (
@@ -49,7 +50,7 @@ export default function Header() {
 
     useEffect(() => {
         const routes = ["/ggs", "/ggs/register", "/ggs/teams", "/ggs/grouping", "/ggs/score"]
-        const index = routes.findLastIndex((it) => matchPath(it, pathname))
+        const index = findLastIndex(routes, (it) => !!matchPath(it, pathname))
         if (index == -1) {
             setCurrentTab(0)
         } else {
