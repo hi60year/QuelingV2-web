@@ -242,7 +242,8 @@ function RegistrationPage(props: {inviteCode: string}) {
                         name: it.tziakchaName
                     }],
                     extraInfo: {
-                        isCurrentStudent: it.isCurrentStudent
+                        isCurrentStudent: it.isCurrentStudent,
+                        qqNum: it.qqNum
                     }
                 })),
                 extraInfo: {
