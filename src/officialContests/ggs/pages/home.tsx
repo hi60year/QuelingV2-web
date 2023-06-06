@@ -204,7 +204,6 @@ function RegistrationPage(props: {inviteCode: string}) {
     const [showSpinner, setShowSpinner] = useState(false)
     const [cardRef, {width: cardWidth}] = useMeasure()
     const [debouncedTeamName, setDebouncedTeamName] = useState("")
-    const [campuses, setCampuses] = useState("")
     const [players, setPlayers] = useState<PlayerPayload[]>([newPlayer()])
     const [leaderIndex, setLeaderIndex] = useState(0)
     const [validationError, setValidationError] = useState("")
@@ -234,12 +233,10 @@ function RegistrationPage(props: {inviteCode: string}) {
                     }],
                     extraInfo: {
                         isCurrentStudent: it.isCurrentStudent,
-                        qqNum: it.qqNum
+                        qqNum: it.qqNum,
+                        college: it.college
                     }
-                })),
-                extraInfo: {
-                    colleges: campuses,
-                }
+                }))
             },
             inviteCode: props.inviteCode
         }
@@ -285,21 +282,27 @@ function RegistrationPage(props: {inviteCode: string}) {
     const renderPlayerItem = (player: PlayerPayload, index: number) => (
         <ListItem sx={{px: 0, pt: index === 0 ? 0 : 1}}>
             <Grid container spacing={2} sx={{width: "100%", px: 3}} columns={17}>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                     <TextField size={"small"} value={player.name} onChange={(e) => {
                         players[index].name = e.target.value
                         setPlayers([...players])
                     }} />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                     <TextField size={"small"} value={player.tziakchaName} onChange={(e) => {
                         players[index].tziakchaName = e.target.value
                         setPlayers([...players])
                     }} />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                     <TextField size={"small"} value={player.qqNum} onChange={(e) => {
                         players[index].qqNum = e.target.value
+                        setPlayers([...players])
+                    }} />
+                </Grid>
+                <Grid item xs={3}>
+                    <TextField size={"small"} value={player.college} onChange={(e) => {
+                        players[index].college = e.target.value
                         setPlayers([...players])
                     }} />
                 </Grid>
@@ -349,7 +352,7 @@ function RegistrationPage(props: {inviteCode: string}) {
         setSubmitDisabled(true)
         for (let i = 0; i < players.length; i++) {
             const it = players[i]
-            if (!(it.name && it.tziakchaName && it.qqNum)) {
+            if (!(it.name && it.tziakchaName && it.qqNum && it.college)) {
                 setValidationError(`选手${i + 1}的信息未填写完整!`)
                 setSubmitDisabled(false)
                 return
@@ -399,26 +402,7 @@ function RegistrationPage(props: {inviteCode: string}) {
             </Card>
             <Collapse in={nameAcknowledged()}>
                 <Stack spacing={2}>
-                    <Card>
-                        <CardContent>
-                            <Typography variant={"h6"}>
-                                成员学校
-                            </Typography>
-                            <Typography color={"grey"}>
-                                请填写该队内所有成员的学校，不同学校之间请用半角逗号分隔，方便审核；若队内成员均来自队伍名所示学校，则该项可不填。
-                            </Typography>
-                        </CardContent>
 
-                        <CardActions>
-                            <TextField value={campuses}
-                                       onChange={e => setCampuses(e.target.value)}
-                                       size={"small"}
-                                       variant={"standard"}
-                                       sx={{mx: 1, mb: 1}}
-                                       fullWidth
-                            />
-                        </CardActions>
-                    </Card>
                     <Card>
                         <CardContent>
                             <Typography variant={"h6"}>
@@ -427,19 +411,24 @@ function RegistrationPage(props: {inviteCode: string}) {
                         </CardContent>
                         <CardContent>
                             <Grid container spacing={2} sx={{width: "100%", px: 3, mb: -3}} columns={17}>
-                                <Grid item xs={4}>
-                                    <Typography>
+                                <Grid item xs={3}>
+                                    <Typography sx={{ml :1}}>
                                         <b>名称</b>
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={4}>
-                                    <Typography>
+                                <Grid item xs={3}>
+                                    <Typography sx={{ml :1}}>
                                         <b>雀渣名称</b>
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={4}>
-                                    <Typography>
+                                <Grid item xs={3}>
+                                    <Typography sx={{ml :1}}>
                                         <b>QQ号</b>
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <Typography sx={{ml :1}}>
+                                        <b>学校</b>
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={3} />

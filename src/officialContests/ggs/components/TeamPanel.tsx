@@ -129,7 +129,8 @@ export default function TeamPanel(props: {teamId: string}) {
                                                     <TableCell>序号</TableCell>,
                                                     <TableCell>名称</TableCell>,
                                                     <TableCell>雀渣名称</TableCell>,
-                                                    <TableCell>QQ号</TableCell>
+                                                    <TableCell>QQ号</TableCell>,
+                                                    <TableCell>学校</TableCell>
                                                 ].map((col, i) => <Zoom key={i} in={true} style={{transitionDelay: `${i * 50}ms`}}>
                                                     {col}
                                                 </Zoom>)
@@ -153,6 +154,7 @@ export default function TeamPanel(props: {teamId: string}) {
                                                         <TableCell>{mem?.name}</TableCell>
                                                         <TableCell>{mem?.platformInfos[0]?.name}</TableCell>
                                                         <TableCell>{mem?.extraInfo["qqNum"]}</TableCell>
+                                                        <TableCell>{mem?.extraInfo["college"]}</TableCell>
                                                     </TableRow>
                                                 </Fade>)
                                         }

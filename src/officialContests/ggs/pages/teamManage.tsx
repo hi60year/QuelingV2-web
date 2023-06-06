@@ -50,9 +50,6 @@ export default function TeamManage() {
     const [searchParams] = useSearchParams()
 
     const authorizationCode = searchParams.get("authorizationCode")
-
-    const [extraInfoChanged, setExtraInfoChanged] = useState(false)
-    const [campuses, setCampuses] = useState("")
     const [players, setPlayers] = useState<PlayerPayload[]>([newPlayer()])
     const [leaderIndex, setLeaderIndex] = useState(0)
     const [leaderIndexChanged, setLeaderIndexChanged] = useState(false)
@@ -73,11 +70,10 @@ export default function TeamManage() {
             setPlayers(teamData?.teamById?.players?.map((it) => ({
                 name: it.name,
                 tziakchaName: it.platformInfos[0]?.name ?? "",
-                qqNum: it.extraInfo["qqNum"] ?? "",
-                isCurrentStudent: it.extraInfo["isCurrentStudent"] ?? false
+                qqNum: it.extraInfo?.["qqNum"] ?? "",
+                isCurrentStudent: it.extraInfo?.["isCurrentStudent"] ?? false,
+                college: it.extraInfo?.["college"] ?? false
             }))??[])
-
-            setCampuses(teamData?.teamById?.extraInfo["colleges"]??"")
         }
     }, [fetchingTeam, fetchTeamError, teamData])
 
@@ -86,9 +82,6 @@ export default function TeamManage() {
             teamId: teamId ?? "",
             payload: {
                 authorizationCode: authorizationCode ?? "",
-                extraInfo: extraInfoChanged ? {
-                    "colleges": campuses
-                } : undefined,
                 players: playersChanged ? players.map((it) => ({
                     name: it.name,
                     platformInfos: [{
@@ -97,7 +90,8 @@ export default function TeamManage() {
                     }],
                     extraInfo: {
                         isCurrentStudent: it.isCurrentStudent,
-                        qqNum: it.qqNum
+                        qqNum: it.qqNum,
+                        college: it.college
                     }
                 })) : undefined,
                 leaderIndex: leaderIndexChanged ? leaderIndex : undefined
@@ -108,23 +102,30 @@ export default function TeamManage() {
     const renderPlayerItem = (player: PlayerPayload, index: number) => (
         <ListItem sx={{px: 0, pt: index === 0 ? 0 : 1}}>
             <Grid container spacing={2} sx={{width: "100%", px: 3}} columns={17}>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                     <TextField size={"small"} value={player.name} onChange={(e) => {
                         players[index].name = e.target.value
                         setPlayersChanged(true)
                         setPlayers([...players])
                     }} />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                     <TextField size={"small"} value={player.tziakchaName} onChange={(e) => {
                         players[index].tziakchaName = e.target.value
                         setPlayersChanged(true)
                         setPlayers([...players])
                     }} />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                     <TextField size={"small"} value={player.qqNum} onChange={(e) => {
                         players[index].qqNum = e.target.value
+                        setPlayersChanged(true)
+                        setPlayers([...players])
+                    }} />
+                </Grid>
+                <Grid item xs={3}>
+                    <TextField size={"small"} value={player.college} onChange={(e) => {
+                        players[index].college = e.target.value
                         setPlayersChanged(true)
                         setPlayers([...players])
                     }} />
@@ -181,7 +182,7 @@ export default function TeamManage() {
         setSubmitDisabled(true)
         for (let i = 0; i < players.length; i++) {
             const it = players[i]
-            if (!(it.name && it.tziakchaName && it.qqNum)) {
+            if (!(it.name && it.tziakchaName && it.qqNum && it.college)) {
                 setValidationError(`选手${i + 1}的信息未填写完整!`)
                 setSubmitDisabled(false)
                 return
@@ -196,6 +197,7 @@ export default function TeamManage() {
             setSubmitDialogOpened(true)
             setTimeout(() => {
                 nav("/ggs")
+                nav(0)
             }, 3000)
         } else {
             setValidationError(result.errors?.toString()??"")
@@ -226,47 +228,29 @@ export default function TeamManage() {
                     <Card>
                         <CardContent>
                             <Typography variant={"h6"}>
-                                成员学校
-                            </Typography>
-                            <Typography color={"grey"}>
-                                请填写该队内所有成员的学校，不同学校之间请用半角逗号分隔，方便审核；若队内成员均来自队伍名所示学校，则该项可不填。
-                            </Typography>
-                        </CardContent>
-
-                        <CardActions>
-                            <TextField value={campuses}
-                                       onChange={e => {
-                                           setExtraInfoChanged(true)
-                                           setCampuses(e.target.value)
-                                       }}
-                                       size={"small"}
-                                       variant={"standard"}
-                                       sx={{mx: 1, mb: 1}}
-                                       fullWidth
-                            />
-                        </CardActions>
-                    </Card>
-                    <Card>
-                        <CardContent>
-                            <Typography variant={"h6"}>
                                 成员
                             </Typography>
                         </CardContent>
                         <CardContent>
                             <Grid container spacing={2} sx={{width: "100%", px: 3, mb: -3}} columns={17}>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <Typography>
                                         <b>名称</b>
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <Typography>
                                         <b>雀渣名称</b>
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <Typography>
                                         <b>QQ号</b>
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <Typography>
+                                        <b>学校</b>
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={3} />
