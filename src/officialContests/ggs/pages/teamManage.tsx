@@ -72,7 +72,7 @@ export default function TeamManage() {
         if (!fetchingTeam && !fetchTeamError) {
             setPlayers(teamData?.teamById?.players?.map((it) => ({
                 name: it.name,
-                tziakchaName: it.platformInfos[0].name ?? "",
+                tziakchaName: it.platformInfos[0]?.name ?? "",
                 qqNum: it.extraInfo["qqNum"] ?? "",
                 isCurrentStudent: it.extraInfo["isCurrentStudent"] ?? false
             }))??[])
