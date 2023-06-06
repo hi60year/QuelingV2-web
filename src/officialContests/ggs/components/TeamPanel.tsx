@@ -7,7 +7,7 @@ import {
     Paper,
     Stack,
     Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, TextField, Zoom
+    TableContainer, TableHead, TableRow, TextField, useMediaQuery, Zoom
 } from "@mui/material";
 import {useLazyQuery, useQuery} from "@apollo/client";
 import {gql} from "../../../__generated__";
@@ -60,6 +60,7 @@ export default function TeamPanel(props: {teamId: string}) {
     const [authorizationCode, setAuthorizationCode] = useState("")
     const [loadingAuthorizationCode, setLoadingAuthorizationCode] = useState(false)
     const [authorizationCodeError, setAuthorizationCodeError] = useState(false)
+    const isShortScreen = useMediaQuery('(max-height:700px)')
     const nav = useNavigate()
 
     const {teamId} = props
@@ -119,8 +120,8 @@ export default function TeamPanel(props: {teamId: string}) {
                     </Stack>
                     <Fade in={true} style={{transitionDuration: "1s"}}>
                         <Paper elevation={4} sx={{marginTop: "20px"}}>
-                            <TableContainer sx={{maxHeight: "490px"}}>
-                                <Table ref={containerRef} stickyHeader>
+                            <TableContainer sx={{maxHeight: isShortScreen ? "300px" : "490px"}}>
+                                <Table ref={containerRef} stickyHeader size={isShortScreen ? "small" : "medium"}>
                                     <TableHead>
                                         <TableRow>
                                             {
