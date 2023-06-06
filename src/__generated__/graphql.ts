@@ -52,6 +52,11 @@ export type ContestInviteCodeArgs = {
   authorizationCode: Scalars['String'];
 };
 
+
+export type ContestTeamsArgs = {
+  pageNum: Scalars['Int'];
+};
+
 export enum ContestStatus {
   End = 'End',
   Holding = 'Holding',
@@ -83,12 +88,19 @@ export type MaxTeamMemberExceededError = {
 export type Mutation = {
   __typename?: 'Mutation';
   registerNewTeam: TeamRegistrationResult;
+  updateTeam: Scalars['Boolean'];
 };
 
 
 export type MutationRegisterNewTeamArgs = {
   inviteCode?: InputMaybe<Scalars['String']>;
   registrationPayload?: InputMaybe<TeamRegistrationPayload>;
+};
+
+
+export type MutationUpdateTeamArgs = {
+  teamId: Scalars['ID'];
+  updatePayload?: InputMaybe<TeamUploadPayload>;
 };
 
 export enum Platform {
@@ -155,6 +167,8 @@ export type Query = {
   playerById?: Maybe<Player>;
   playersByName: Array<Player>;
   riichiContestNum: Scalars['Int'];
+  teamById?: Maybe<Team>;
+  teams: Array<Team>;
 };
 
 
@@ -193,10 +207,25 @@ export type QueryPlayersByNameArgs = {
   name: Scalars['String'];
 };
 
+
+export type QueryTeamByIdArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryTeamsArgs = {
+  contestId?: InputMaybe<Scalars['ID']>;
+  id?: InputMaybe<Scalars['ID']>;
+  name?: InputMaybe<Scalars['String']>;
+  pageNum: Scalars['Int'];
+};
+
 export type RankingInfo = MahjongSoulRankingInfo | TenhouRankingInfo;
 
 export type Team = {
   __typename?: 'Team';
+  checkAuthorizationCode: Scalars['Boolean'];
+  contest: Contest;
   contestId: Scalars['String'];
   extraInfo?: Maybe<Scalars['JSON']>;
   hasLeader: Scalars['Boolean'];
@@ -204,8 +233,14 @@ export type Team = {
   leaderIndex?: Maybe<Scalars['Int']>;
   leaderPlayer?: Maybe<Player>;
   name: Scalars['String'];
+  playerOrder?: Maybe<Array<Scalars['Int']>>;
   players: Array<Player>;
   status?: Maybe<TeamStatus>;
+};
+
+
+export type TeamCheckAuthorizationCodeArgs = {
+  authorizationCode: Scalars['String'];
 };
 
 export type TeamNameAlreadyExistError = {
@@ -238,6 +273,13 @@ export enum TeamStatus {
   Rejected = 'Rejected'
 }
 
+export type TeamUploadPayload = {
+  authorizationCode: Scalars['String'];
+  extraInfo?: InputMaybe<Scalars['JSON']>;
+  leaderIndex?: InputMaybe<Scalars['Int']>;
+  players?: InputMaybe<Array<InputMaybe<PlayerPayload>>>;
+};
+
 export type TenhouRankingInfo = {
   __typename?: 'TenhouRankingInfo';
   ranking3?: Maybe<Scalars['Int']>;
@@ -251,6 +293,21 @@ export type GetContestListQueryVariables = Exact<{
 
 
 export type GetContestListQuery = { __typename?: 'Query', allContestsByRule: Array<{ __typename?: 'Contest', name: string, isIndividual: boolean, homePage?: string | null, platformEngine?: any | null, status: ContestStatus, id: string }> };
+
+export type GgsTeamQueryQueryVariables = Exact<{
+  teamId: Scalars['ID'];
+}>;
+
+
+export type GgsTeamQueryQuery = { __typename?: 'Query', teamById?: { __typename?: 'Team', name: string, leaderIndex?: number | null, playerOrder?: Array<number> | null, extraInfo?: any | null, status?: TeamStatus | null, players: Array<{ __typename?: 'Player', name: string, extraInfo?: any | null, platformInfos: Array<{ __typename?: 'PlatformInfo', name: string, platform: Platform }> }> } | null };
+
+export type CheckAuthorizationCodeQueryQueryVariables = Exact<{
+  teamId: Scalars['ID'];
+  authorizationCode: Scalars['String'];
+}>;
+
+
+export type CheckAuthorizationCodeQueryQuery = { __typename?: 'Query', teamById?: { __typename?: 'Team', checkAuthorizationCode: boolean } | null };
 
 export type InviteCodeQueryQueryVariables = Exact<{
   contestId: Scalars['ID'];
@@ -276,6 +333,29 @@ export type SaveTeamMutationVariables = Exact<{
 
 export type SaveTeamMutation = { __typename?: 'Mutation', registerNewTeam: { __typename?: 'TeamRegistrationResult', authorizationCode?: string | null, error?: { __typename?: 'InviteCodeNotMatchError', msg: string } | { __typename?: 'MaxTeamMemberExceededError', msg: string } | { __typename?: 'TeamNameAlreadyExistError', msg: string } | null } };
 
+export type UpdateTeamMutationMutationVariables = Exact<{
+  teamId: Scalars['ID'];
+  payload: TeamUploadPayload;
+}>;
+
+
+export type UpdateTeamMutationMutation = { __typename?: 'Mutation', updateTeam: boolean };
+
+export type GgsTeamsQueryQueryVariables = Exact<{
+  contestId: Scalars['ID'];
+  pageNum: Scalars['Int'];
+}>;
+
+
+export type GgsTeamsQueryQuery = { __typename?: 'Query', teams: Array<{ __typename?: 'Team', name: string, leaderIndex?: number | null, status?: TeamStatus | null, id: string, players: Array<{ __typename?: 'Player', name: string }> }> };
+
+export type TeamNumQueryQueryVariables = Exact<{
+  contestId: Scalars['ID'];
+}>;
+
+
+export type TeamNumQueryQuery = { __typename?: 'Query', contestById?: { __typename?: 'Contest', attendNum: number } | null };
+
 export type GetComContestNumQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -288,8 +368,13 @@ export type GetRiichiContestNumQueryQuery = { __typename?: 'Query', riichiContes
 
 
 export const GetContestListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetContestList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pageNum"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"rule"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MahjongType"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allContestsByRule"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"rule"},"value":{"kind":"Variable","name":{"kind":"Name","value":"rule"}}},{"kind":"Argument","name":{"kind":"Name","value":"pageNum"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pageNum"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isIndividual"}},{"kind":"Field","name":{"kind":"Name","value":"homePage"}},{"kind":"Field","name":{"kind":"Name","value":"platformEngine"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"homePage"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GetContestListQuery, GetContestListQueryVariables>;
+export const GgsTeamQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GgsTeamQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"teamById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"players"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"platformInfos"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"platform"}}]}},{"kind":"Field","name":{"kind":"Name","value":"extraInfo"}}]}},{"kind":"Field","name":{"kind":"Name","value":"leaderIndex"}},{"kind":"Field","name":{"kind":"Name","value":"playerOrder"}},{"kind":"Field","name":{"kind":"Name","value":"extraInfo"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<GgsTeamQueryQuery, GgsTeamQueryQueryVariables>;
+export const CheckAuthorizationCodeQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CheckAuthorizationCodeQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"authorizationCode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"teamById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"checkAuthorizationCode"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"authorizationCode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"authorizationCode"}}}]}]}}]}}]} as unknown as DocumentNode<CheckAuthorizationCodeQueryQuery, CheckAuthorizationCodeQueryQueryVariables>;
 export const InviteCodeQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"InviteCodeQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contestId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"inviteCode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contestById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contestId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"checkInviteCode"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"inviteCode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"inviteCode"}}}]}]}}]}}]} as unknown as DocumentNode<InviteCodeQueryQuery, InviteCodeQueryQueryVariables>;
 export const TeamNameExistQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TeamNameExistQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contestId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contestById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contestId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"checkTeamNameExist"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}}]}]}}]}}]} as unknown as DocumentNode<TeamNameExistQueryQuery, TeamNameExistQueryQueryVariables>;
 export const SaveTeamDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SaveTeam"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"payload"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TeamRegistrationPayload"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"inviteCode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"registerNewTeam"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"registrationPayload"},"value":{"kind":"Variable","name":{"kind":"Name","value":"payload"}}},{"kind":"Argument","name":{"kind":"Name","value":"inviteCode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"inviteCode"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authorizationCode"}},{"kind":"Field","name":{"kind":"Name","value":"error"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"TeamNameAlreadyExistError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"msg"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"InviteCodeNotMatchError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"msg"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"MaxTeamMemberExceededError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"msg"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SaveTeamMutation, SaveTeamMutationVariables>;
+export const UpdateTeamMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateTeamMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"payload"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TeamUploadPayload"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateTeam"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"teamId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"teamId"}}},{"kind":"Argument","name":{"kind":"Name","value":"updatePayload"},"value":{"kind":"Variable","name":{"kind":"Name","value":"payload"}}}]}]}}]} as unknown as DocumentNode<UpdateTeamMutationMutation, UpdateTeamMutationMutationVariables>;
+export const GgsTeamsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GgsTeamsQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contestId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pageNum"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"teams"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"contestId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contestId"}}},{"kind":"Argument","name":{"kind":"Name","value":"pageNum"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pageNum"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"players"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"leaderIndex"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GgsTeamsQueryQuery, GgsTeamsQueryQueryVariables>;
+export const TeamNumQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"TeamNumQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"contestId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contestById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"contestId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"attendNum"}}]}}]}}]} as unknown as DocumentNode<TeamNumQueryQuery, TeamNumQueryQueryVariables>;
 export const GetComContestNumQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetComContestNumQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comContestNum"}}]}}]} as unknown as DocumentNode<GetComContestNumQueryQuery, GetComContestNumQueryQueryVariables>;
 export const GetRiichiContestNumQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRiichiContestNumQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"riichiContestNum"}}]}}]} as unknown as DocumentNode<GetRiichiContestNumQueryQuery, GetRiichiContestNumQueryQueryVariables>;

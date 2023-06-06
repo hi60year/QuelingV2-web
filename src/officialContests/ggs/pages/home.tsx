@@ -24,6 +24,9 @@ import './home.css'
 import {Check, Close, Delete} from "@mui/icons-material";
 import {TransitionGroup} from "react-transition-group";
 import ggsQuelingId from "../utils/ggsQuelingId.ts";
+import Teams from "./teams.tsx";
+import TeamManage from "./teamManage.tsx";
+import {newPlayer, PlayerPayload} from "../utils/playerUtils.ts";
 
 export default function GgsHome() {
     return (
@@ -35,6 +38,8 @@ export default function GgsHome() {
                 <Box sx={{width: "calc(min(1200px, 100%))", alignSelf: "center", py: 3}}>
                     <Routes>
                         <Route path={"register"} element={<Register />}/>
+                        <Route path={"teams"} element={<Teams />} />
+                        <Route path={"teams/manage/:teamId"} element={<TeamManage />} />
                     </Routes>
                 </Box>
             </Stack>
@@ -192,20 +197,6 @@ function Register() {
         </Stack>
     )
 }
-
-interface PlayerPayload {
-    name: string,
-    tziakchaName: string,
-    qqNum: string,
-    isCurrentStudent: boolean
-}
-
-const newPlayer = (): PlayerPayload => ({
-    name: "",
-    tziakchaName: "",
-    qqNum: "",
-    isCurrentStudent: true
-})
 
 function RegistrationPage(props: {inviteCode: string}) {
 
